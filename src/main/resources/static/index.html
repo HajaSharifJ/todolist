@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<body>
+
+	<script>
+		var app = angular.module("todoList", []);
+		app.controller("controller", function($scope, $http) {
+			
+			$scope.addItem = function addItem() {
+				var obj = {
+					"name": $scope.newItem
+				};
+				$http.put("http://localhost:8080/todo/",
+					obj).then(function () {
+					$scope.init();
+				});
+			};
+			
+			$scope.markComplete = function (id, name) {
+				var obj = {
+					"id": id,
+					"name": name,
+					"complete": true
+				};
+				$http.post("http://localhost:8080/todo/",
+						obj).then(function () {
+						$scope.init();
+					});
+			}
+			
+			$scope.deleteFun = function (id) {
+				var deleteUrl = "http://localhost:8080/todo/" + id;
+				$http.delete(deleteUrl).then(function () {
+					$scope.init();
+				});
+			} 
+			$scope.init = function init() {
+				$http.get("http://localhost:8080/todo/all").then(
+					function(response) {
+						$scope.todoItems = response.data;
+					});
+			}
+			
+			$scope.init();
+		});
+	</script>
+
+	<div ng-app="todoList" ng-controller="controller" style="padding:30px">
+		<h2>Todo List</h2>
+		<div class="row">
+		<label>New <input type="text" ng-model="newItem"> 
+		<button ng-click="addItem()">Add</button>
+		</label>
+		</div>
+		<div class="row">
+			<label>
+				<input type="checkbox" ng-model="showCompleted" /> <span
+					ng-if="showCompleted">Hide</span> <span ng-if="!showCompleted">Show</span>
+				Completed Tasks
+			</label>
+		</div>
+		<div class="row">
+			<label>Search: <input ng-model="searchText"></label>
+		</div>
+		<div>
+			<div class="row" style="background:grey; padding:10px">
+				<div class="col-xs-4">Todo Item</div>
+				<div padding:10px" class="col-xs-4">Operations</div>
+			</div>
+			<div class="row" ng-repeat="x in todoItems | filter:searchText"
+				ng-show="!x.complete || showCompleted" ng-style="x.complete && {'background':'#98FB98'} || {'background-color':'#F5DEB3'}">
+				<div class="col-xs-4"
+					ng-style="x.complete && {'color':'green'} || {'color': 'red'}">{{x.name}}</div>
+				<div class="col-xs-2">
+					<a href="#" ng-click="markComplete(x.id, x.name)"
+						ng-if="!x.complete"> Mark as complete!!</a>
+				</div>
+				<div class="col-xs-2">
+					<a href="#" ng-click="deleteFun(x.id)"> Delete Task!!</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+</body>
+</html>
