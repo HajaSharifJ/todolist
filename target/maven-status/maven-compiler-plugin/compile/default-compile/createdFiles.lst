@@ -1,0 +1,5 @@
+com\todo\TodoItemController.class
+com\todo\DBSeeder.class
+com\todo\TodoItem.class
+com\todo\TodoItemRepository.class
+com\todo\ToDoListApplication.class
